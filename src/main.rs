@@ -9,7 +9,7 @@ async fn main() {
     let router = Router::new()
     .route("/", get(root_get))
     .route("/api/cpu", get(get_cpus_usage))
-    .route("/index.js", get(get_index_js))
+    .route("/index.mjs", get(get_index_mjs))
     .with_state(AppState {
         sys: Arc::new(Mutex::new(System::new())),
     });
@@ -43,11 +43,11 @@ async fn get_cpus_usage(State(state): State<AppState>) -> impl IntoResponse {
     Json(v)
 }
 
-async fn get_index_js() -> impl IntoResponse{
-    let asset = tokio::fs::read_to_string("src/index.js").await.unwrap();
+async fn get_index_mjs() -> impl IntoResponse{
+    let asset = tokio::fs::read_to_string("src/index.mjs").await.unwrap();
 
     Response::builder()
-        .header("content-type", "application/javascript:charset=utf-8")
+        .header("content-type", "application/javascript;charset=utf-8")
         .body(asset)
         .unwrap()
 }
