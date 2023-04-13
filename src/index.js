@@ -1,8 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
-    let c = 0
+    setInterval(async () => {
+        let response = await fetch('/api/cpu')
 
-    setInterval(() => {
-        c += 1
-        document.body.textContent = `count is at ${c}`
-    }, 1000);
+        if (response.status !== 200) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        let json = await response.json()
+        document.body.textContent = JSON.stringify(json, null, 2)
+    }, 1000)
 })
