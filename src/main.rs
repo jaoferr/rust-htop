@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use axum::{Server, Router, routing::get, extract::State};
+use axum::{Server, Router, routing::get, extract::State, Json, response::{IntoResponse, Html}};
 use futures::lock::Mutex;
 use sysinfo::{System, SystemExt, CpuExt};
 
@@ -8,6 +8,7 @@ use sysinfo::{System, SystemExt, CpuExt};
 async fn main() {
     let router = Router::new()
     .route("/", get(root_get))
+    .route("/api/cpu", get(get_cpus_usage))
     .with_state(AppState {
         sys: Arc::new(Mutex::new(System::new())),
     });
@@ -27,20 +28,16 @@ struct AppState {
     sys: Arc<Mutex<System>>,
 }
 
-async fn root_get(State(state): State<AppState>) -> String {
-    use std::fmt::Write;
+async fn root_get() -> impl IntoResponse{
+    let markup = tokio::fs::read_to_string("src/index.html").await.unwrap();
+    Html(markup)
+}
 
-    let mut s = String::new();
-
+#[axum::debug_handler]
+async fn get_cpus_usage(State(state): State<AppState>) -> impl IntoResponse {
     let mut sys = state.sys.lock().await;
     sys.refresh_cpu();
+    let v: Vec<_> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();
 
-    for (i, cpu) in sys.cpus().iter().enumerate() {
-        let i = i + 1;
-        let usage = cpu.cpu_usage();
-
-        writeln!(&mut s, "CPU {i} {usage}% ").unwrap();
-    }
-
-    s
+    Json(v)
 }
