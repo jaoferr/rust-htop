@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use axum::{Server, Router, routing::get, extract::State, Json, response::{IntoResponse, Html}};
+use axum::{Server, Router, routing::get, extract::State, Json, response::{IntoResponse, Html}, http::Response};
 use futures::lock::Mutex;
 use sysinfo::{System, SystemExt, CpuExt};
 
@@ -9,6 +9,7 @@ async fn main() {
     let router = Router::new()
     .route("/", get(root_get))
     .route("/api/cpu", get(get_cpus_usage))
+    .route("/index.js", get(get_index_js))
     .with_state(AppState {
         sys: Arc::new(Mutex::new(System::new())),
     });
@@ -40,4 +41,13 @@ async fn get_cpus_usage(State(state): State<AppState>) -> impl IntoResponse {
     let v: Vec<_> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();
 
     Json(v)
+}
+
+async fn get_index_js() -> impl IntoResponse{
+    let asset = tokio::fs::read_to_string("src/index.js").await.unwrap();
+
+    Response::builder()
+        .header("content-type", "application/javascript:charset=utf-8")
+        .body(asset)
+        .unwrap()
 }
