@@ -8,5 +8,6 @@ edition = "2021"
 [dependencies]
 axum = { version = "0.6.12", features = ["macros"]}
 futures = "0.3.28"
+mime = "0.3.17"
 sysinfo = "0.28.4"
 tokio = { version = "1.27.0", features = ["full"] }

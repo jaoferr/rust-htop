@@ -21,5 +21,5 @@ setInterval(async () => {
     }
 
     let json = await response.json()
-    render(html`<${App} cpus=${json} />`, document.body)
+    render(html`<${App} cpus=${json} />`, document.querySelector('preact-view'))
 }, 1000)
