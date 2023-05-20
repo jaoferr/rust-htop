@@ -4,7 +4,7 @@ mod asset_handler;
 use std::sync::{Arc, Mutex};
 
 use axum::{
-    extract::State,
+    extract::{State, WebSocketUpgrade, ws::{WebSocket, Message}},
     response::{Html, IntoResponse},
     routing::get,
     Json, Router, Server
@@ -18,6 +18,7 @@ async fn main() {
     let router = Router::new()
         .route("/", get(root_get))
         .route("/api/cpu", get(get_cpus_usage))
+        .route("/ws/cpu", get(get_realtime_cpus_usage))
         .route("/asset/*path", get(asset_handler::get_asset))
         .with_state(app_state.clone());
 
@@ -58,4 +59,22 @@ async fn get_cpus_usage(State(state): State<AppState>) -> impl IntoResponse {
     let v = state.cpus.lock().unwrap().clone();
 
     Json(v)
+}
+
+#[axum::debug_handler]
+async fn get_realtime_cpus_usage(ws: WebSocketUpgrade, State(state): State<AppState>) -> impl IntoResponse {
+    ws.on_upgrade(move |ws: WebSocket| async {
+        realtime_cpus_usage_stream(state, ws).await;
+    })
+}
+
+async fn realtime_cpus_usage_stream(app_state: AppState, mut ws: WebSocket) {
+    loop {
+        let payload = serde_json::to_string(&*app_state.cpus.lock().unwrap()).unwrap();
+
+        ws.send(Message::Text(payload)).await.unwrap();
+
+        tokio::time::sleep(std::time::Duration::from_millis(1000)).await
+    }
+    
 }
