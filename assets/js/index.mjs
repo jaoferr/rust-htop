@@ -6,8 +6,12 @@ const html = htm.bind(h)
 function App(props) {
     return html`
     <div>
-        ${props.cpus.map((cpu) => {
-            return html`<div>${cpu.toFixed(2)}% usage</div>`
+        ${props.cpus.map((cpu, idx) => {
+            return html`
+                <div class="cpu-usage-bar">
+                    <div class="cpu-usage-bar-inner" style="width: ${cpu}%;"></div>
+                    <span class="cpu-usage-text">CPU ${idx}: ${cpu.toFixed(2)}%</span>
+                </div>`
         })}
     </div>
     `

@@ -1,4 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+
+body {
+    font-family: 'Lato', sans-serif;
+    background-color: rgba(255, 255, 255, 0.65);
+}
+
 h1 {
     background-color: black;
     color: white;
+}
+
+.cpu-usage-bar {
+    background-color: #fff1d0;
+    width: 20em;
+    height: 2em;
+    margin: 0.5em;
+    font-size: 1em;
+    line-height: 2em;
+
+    display: flex;
+    justify-items: center;
+    align-content: center;
+    flex-direction: column;
+
+    position: relative;
+}
+
+.cpu-usage-bar-inner {
+    background-color: #ed6d5a;
+    height: 100%;
+
+    position: absolute;
+}
+
+.cpu-usage-text {
+    margin-left: 1em;
+    z-index: 1;
 }
