@@ -1,13 +1,14 @@
 pub mod utils;
 mod asset_handler;
 mod processes;
+mod cpu_usage;
 
 use std::{sync::{Arc, Mutex}};
 use axum::{
-    extract::{State, WebSocketUpgrade, ws::{WebSocket, Message}},
-    response::{Html, IntoResponse},
     routing::get,
-    Json, Router, Server
+    Router,
+    Server,
+    response::{IntoResponse, Html}
 };
 use sysinfo::{CpuExt, System, SystemExt};
 use tokio::sync::broadcast;
@@ -31,9 +32,9 @@ async fn main() {
 
     let router = Router::new()
         .route("/", get(root_get))
-        .route("/api/cpu", get(get_cpus_usage))
+        .route("/api/cpu", get(cpu_usage::get_cpus_usage))
         .route("/api/processes", get(processes::get_processes_list))
-        .route("/ws/cpu", get(get_realtime_cpus_usage))
+        .route("/ws/cpu", get(cpu_usage::get_realtime_cpus_usage))
         .route("/asset/*path", get(asset_handler::get_asset))
         .with_state(app_state.clone());
 
@@ -59,29 +60,4 @@ async fn main() {
 async fn root_get() -> impl IntoResponse {
     let markup = tokio::fs::read_to_string("src/views/index.html").await.unwrap();
     Html(markup)
-}
-
-#[axum::debug_handler]
-async fn get_cpus_usage(State(app_state): State<AppState>) -> impl IntoResponse {
-    let mut rx = app_state.tx.subscribe();
-    let v = rx.recv().await.unwrap();
-
-    Json(v)
-}
-
-#[axum::debug_handler]
-async fn get_realtime_cpus_usage(ws: WebSocketUpgrade, State(state): State<AppState>) -> impl IntoResponse {
-    ws.on_upgrade(move |ws: WebSocket| async {
-        realtime_cpus_usage_stream(state, ws).await;
-    })
-}
-
-async fn realtime_cpus_usage_stream(app_state: AppState, mut ws: WebSocket) {
-    let mut rx = app_state.tx.subscribe();
-
-    while let Ok(msg) = rx.recv().await {
-        let payload = serde_json::to_string(&msg).unwrap();
-
-        ws.send(Message::Text(payload)).await.unwrap();
-    }
 }
