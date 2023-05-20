@@ -10,10 +10,15 @@ use axum::{
     Json, Router, Server
 };
 use sysinfo::{CpuExt, System, SystemExt};
+use tokio::sync::broadcast;
+
+type Snapshot = Vec<f32>;
 
 #[tokio::main]
 async fn main() {
-    let app_state = AppState::default();
+    let (tx, _) = broadcast::channel::<Snapshot>(1);
+
+    let app_state = AppState { tx: tx.clone() };
 
     let router = Router::new()
         .route("/", get(root_get))
@@ -26,12 +31,9 @@ async fn main() {
         let mut sys = System::new();
         loop {
             sys.refresh_cpu();
-            let v: Vec<_> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();
+            let v: Vec<_> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();            
+            let _ = tx.send(v);
 
-            {
-                let mut cpus = app_state.cpus.lock().unwrap();
-                *cpus = v;
-            }
             std::thread::sleep(System::MINIMUM_CPU_UPDATE_INTERVAL);
         }
     });
@@ -44,9 +46,9 @@ async fn main() {
     server.await.unwrap();
 }
 
-#[derive(Default, Clone)]
+#[derive(Clone)]
 struct AppState {
-    cpus: Arc<Mutex<Vec<f32>>>
+    tx: broadcast::Sender<Snapshot>
 }
 
 async fn root_get() -> impl IntoResponse {
@@ -55,8 +57,9 @@ async fn root_get() -> impl IntoResponse {
 }
 
 #[axum::debug_handler]
-async fn get_cpus_usage(State(state): State<AppState>) -> impl IntoResponse {
-    let v = state.cpus.lock().unwrap().clone();
+async fn get_cpus_usage(State(app_state): State<AppState>) -> impl IntoResponse {
+    let mut rx = app_state.tx.subscribe();
+    let v = rx.recv().await.unwrap();
 
     Json(v)
 }
@@ -69,12 +72,12 @@ async fn get_realtime_cpus_usage(ws: WebSocketUpgrade, State(state): State<AppSt
 }
 
 async fn realtime_cpus_usage_stream(app_state: AppState, mut ws: WebSocket) {
-    loop {
-        let payload = serde_json::to_string(&*app_state.cpus.lock().unwrap()).unwrap();
+    let mut rx = app_state.tx.subscribe();
+
+    while let Ok(msg) = rx.recv().await {
+        let payload = serde_json::to_string(&msg).unwrap();
 
         ws.send(Message::Text(payload)).await.unwrap();
-
-        tokio::time::sleep(std::time::Duration::from_millis(1000)).await
     }
     
 }
