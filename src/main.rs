@@ -1,3 +1,5 @@
+mod utils;
+
 use std::sync::Arc;
 
 use axum::{
@@ -9,7 +11,6 @@ use axum::{
 };
 use futures::lock::Mutex;
 use sysinfo::{CpuExt, System, SystemExt};
-use mime::Mime;
 
 #[tokio::main]
 async fn main() {
@@ -49,32 +50,11 @@ async fn get_cpus_usage(State(state): State<AppState>) -> impl IntoResponse {
     Json(v)
 }
 
-fn find_mime_type (filename : &String) -> Mime{
-
-    let parts : Vec<&str> = filename.split('.').collect();
-
-    let res = match parts.last() {
-            Some(v) =>
-                match *v {
-                    "png" => mime::IMAGE_PNG,
-                    "jpg" => mime::IMAGE_JPEG,
-                    "json" => mime::APPLICATION_JSON,
-                    "js" => mime::APPLICATION_JAVASCRIPT_UTF_8,
-                    "mjs" => mime::APPLICATION_JAVASCRIPT_UTF_8,
-                    "css" => mime::TEXT_CSS_UTF_8,
-                    &_ => mime::TEXT_PLAIN,
-                },
-            None => mime::TEXT_PLAIN,
-        };
-
-    return res;
-}
-
 async fn get_asset(Path(path): Path<String>) -> impl IntoResponse {
     let mut asset_path = "assets/".to_owned();
     asset_path.push_str(&path);
 
-    let content_type = find_mime_type(&asset_path);
+    let content_type = utils::find_mime_type(&asset_path);
     let asset = tokio::fs::read_to_string(&asset_path).await;
 
     if asset.is_ok() {
@@ -87,5 +67,4 @@ async fn get_asset(Path(path): Path<String>) -> impl IntoResponse {
             .body(Body::empty())
             .unwrap().into_response()
     }
-
 }
