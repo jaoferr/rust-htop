@@ -1,6 +1,8 @@
 pub mod utils;
 mod asset_handler;
+mod processes;
 
+use std::{sync::{Arc, Mutex}};
 use axum::{
     extract::{State, WebSocketUpgrade, ws::{WebSocket, Message}},
     response::{Html, IntoResponse},
@@ -12,15 +14,25 @@ use tokio::sync::broadcast;
 
 type Snapshot = Vec<f32>;
 
+#[derive(Clone)]
+pub struct AppState {
+    sys: Arc<Mutex<System>>,
+    tx: broadcast::Sender<Snapshot>
+}
+
 #[tokio::main]
 async fn main() {
     let (tx, _) = broadcast::channel::<Snapshot>(1);
 
-    let app_state = AppState { tx: tx.clone() };
+    let app_state = AppState {
+        tx: tx.clone(),
+        sys: Arc::new(Mutex::new(System::new()))
+    };
 
     let router = Router::new()
         .route("/", get(root_get))
         .route("/api/cpu", get(get_cpus_usage))
+        .route("/api/processes", get(processes::get_processes_list))
         .route("/ws/cpu", get(get_realtime_cpus_usage))
         .route("/asset/*path", get(asset_handler::get_asset))
         .with_state(app_state.clone());
@@ -29,7 +41,7 @@ async fn main() {
         let mut sys = System::new();
         loop {
             sys.refresh_cpu();
-            let v: Vec<_> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();            
+            let v: Vec<_> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();
             let _ = tx.send(v);
 
             std::thread::sleep(System::MINIMUM_CPU_UPDATE_INTERVAL);
@@ -42,11 +54,6 @@ async fn main() {
     println!("Listening on {addr}");
 
     server.await.unwrap();
-}
-
-#[derive(Clone)]
-struct AppState {
-    tx: broadcast::Sender<Snapshot>
 }
 
 async fn root_get() -> impl IntoResponse {
@@ -77,5 +84,4 @@ async fn realtime_cpus_usage_stream(app_state: AppState, mut ws: WebSocket) {
 
         ws.send(Message::Text(payload)).await.unwrap();
     }
-    
 }
