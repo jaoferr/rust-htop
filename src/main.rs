@@ -50,7 +50,7 @@ struct AppState {
 }
 
 async fn root_get() -> impl IntoResponse {
-    let markup = tokio::fs::read_to_string("src/index.html").await.unwrap();
+    let markup = tokio::fs::read_to_string("src/views/index.html").await.unwrap();
     Html(markup)
 }
 
