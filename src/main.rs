@@ -1,8 +1,6 @@
 pub mod utils;
 mod asset_handler;
 
-use std::sync::{Arc, Mutex};
-
 use axum::{
     extract::{State, WebSocketUpgrade, ws::{WebSocket, Message}},
     response::{Html, IntoResponse},
