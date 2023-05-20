@@ -1,5 +1,5 @@
-import { h, Component, render } from 'https://esm.sh/preact';
-import htm from 'https://esm.sh/htm';
+import { h, Component, render } from 'https://esm.sh/preact'
+import htm from 'https://esm.sh/htm'
 
 const html = htm.bind(h)
 
@@ -17,13 +17,12 @@ function App(props) {
     `
 }
 
-setInterval(async () => {
-    let response = await fetch('/api/cpu')
+let url = new URL('/ws/cpu', window.location.href)
+url.protocol = url.protocol.replace('http', 'ws')
 
-    if (response.status !== 200) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    let json = await response.json()
+let ws = new WebSocket(url.href)
+ws.onmessage = (ev) => {
+    let json = JSON.parse(ev.data)
     render(html`<${App} cpus=${json} />`, document.querySelector('preact-view'))
-}, 1000)
+
+}
