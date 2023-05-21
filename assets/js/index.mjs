@@ -1,5 +1,5 @@
-import { h, Component, render } from 'https://esm.sh/preact'
-import htm from 'https://esm.sh/htm'
+import { h, render } from '/vendor/mjs/preact/preact'
+import htm from '/vendor/mjs/htm/htm'
 
 const html = htm.bind(h)
 
