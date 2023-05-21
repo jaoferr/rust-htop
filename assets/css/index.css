@@ -5,14 +5,24 @@ body {
     background-color: #402e2a;
 }
 
-h1 {
+.page-title {
     background-color: black;
     color: #fff1d0;
+    padding-left: 1em;
+    font-size: 2em;
+}
+
+.section-title {
+    background-color: black;
+    color: #fff1d0;
+    padding-left: 1em;
+    font-size: 1.5em;
+    font-weight: bold;
 }
 
 .cpu-usage-bar {
     background-color: #fff1d0;
-    width: 20em;
+    /* width: 20em; */
     height: 2em;
     margin: 0.5em;
     font-size: 1em;
@@ -35,5 +45,6 @@ h1 {
 
 .cpu-usage-text {
     margin-left: 1em;
-    z-index: 1;
+    z-index: 10;
+    position: relative;
 }
