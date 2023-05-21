@@ -22,16 +22,9 @@ body {
 
 .cpu-usage-bar {
     background-color: #fff1d0;
-    /* width: 20em; */
     height: 2em;
     margin: 0.5em;
-    font-size: 1em;
     line-height: 2em;
-
-    display: flex;
-    justify-items: center;
-    align-content: center;
-    flex-direction: column;
 
     position: relative;
 }
@@ -45,6 +38,7 @@ body {
 
 .cpu-usage-text {
     margin-left: 1em;
+    font-size: 1em;
     z-index: 10;
     position: relative;
 }
