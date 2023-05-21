@@ -35,6 +35,7 @@ async fn main() {
         .route("/api/cpu", get(cpu_usage::get_cpus_usage))
         .route("/api/processes", get(processes::get_processes_list))
         .route("/ws/cpu", get(cpu_usage::get_realtime_cpus_usage))
+        .route("/vendor/:type/:module/*path", get(asset_handler::get_npm_asset))
         .route("/asset/*path", get(asset_handler::get_asset))
         .with_state(app_state.clone());
 
@@ -45,7 +46,8 @@ async fn main() {
             let v: Vec<_> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();
             let _ = tx.send(v);
 
-            std::thread::sleep(System::MINIMUM_CPU_UPDATE_INTERVAL);
+            // std::thread::sleep(System::MINIMUM_CPU_UPDATE_INTERVAL);
+            std::thread::sleep(std::time::Duration::from_secs(1));
         }
     });
 
