@@ -35,7 +35,7 @@ pub async fn get_npm_asset(
 
     match asset_type.as_str() {
         "mjs" => {
-            asset_path = format!("node_modules/{}/dist/{}.module.js", module, path);
+            asset_path = format!("node_modules/{}/dist/{}", module, path);
             content_type = mime::APPLICATION_JAVASCRIPT_UTF_8.to_string();
         },
         "css" => {
@@ -43,7 +43,7 @@ pub async fn get_npm_asset(
             content_type = mime::TEXT_CSS_UTF_8.to_string();
         },
         _ => {
-            asset_path = format!("node_modules/{}/dist/{}.js", module, path);
+            asset_path = format!("node_modules/{}/dist/{}", module, path);
             content_type = mime::APPLICATION_JAVASCRIPT_UTF_8.to_string();
         }
     }

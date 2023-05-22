@@ -1,5 +1,5 @@
-import { h, render } from '/vendor/mjs/preact/preact'
-import htm from '/vendor/mjs/htm/htm'
+import { h, render, Component } from '/vendor/mjs/preact/preact.mjs'
+import htm from '/vendor/mjs/htm/htm.mjs'
 
 const html = htm.bind(h)
 
