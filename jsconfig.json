@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./node_modules",
+        "paths": {
+            "/vendor/mjs/preact/*": ["preact/dist/*"],
+            "/vendor/mjs/htm/*": ["htm/dist/*"]
+        }
+    }
+}
