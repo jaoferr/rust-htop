@@ -78,3 +78,37 @@ body {
     padding: 5px;
     border-right: #402e2a solid;
 }
+
+.disk-usage-bar {
+    background-color: #fff1d0;
+    height: 1.5em;
+    margin: 0.5em;
+    margin-top: 0;
+    line-height: 1.5em;
+
+    position: relative;
+}
+
+.disk-usage-bar-inner {
+    background-color: #ed6d5a;
+    height: 100%;
+
+    position: absolute;
+}
+
+.disk-usage-text {
+    margin-left: 1em;
+    font-size: 1em;
+    z-index: 10;
+    position: relative;
+}
+
+.disk-name-text {
+    background-color: #fff1d0;
+    margin-top: 0.5em;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    font-size: 1em;
+    border-bottom: 2px #402e2a solid;
+    text-align: center;
+}

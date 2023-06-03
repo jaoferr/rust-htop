@@ -139,17 +139,22 @@ class SystemInfo extends Component {
         return `${(hours<10) ? '0' + hours : hours}:${(minutes<10) ? '0' + minutes : minutes}:${(seconds<10) ? '0' + seconds : seconds}`
     }
 
+    fetchSystemInfo = () => {
+        fetch('/api/sysinfo')
+        .then(async (response) => {
+            // console.log(await response.json())
+            this.setState({ systemInfo: await response.json() })
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+    }
+
     componentDidMount() {
+        this.fetchSystemInfo()
         this.updateInterval = setInterval(() => {
-            fetch('/api/sysinfo')
-            .then(async (response) => {
-                // console.log(await response.json())
-                this.setState({ systemInfo: await response.json() })
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        }, 3000)
+            this.fetchSystemInfo()
+        }, 10000)
     }
 
     componentWillUnmount() {
@@ -186,11 +191,66 @@ class SystemInfo extends Component {
     }
 }
 
+class DiskInfo extends Component {
+    state = { disks: [] }
+
+    formatDiskSpace = (diskSpace) => {
+        if (diskSpace > 10000) {
+            return (diskSpace / 1000).toFixed(2) + ' GB'
+        }
+        return diskSpace + ' MB'
+    }
+
+    fetchDiskInfo = () => {
+        fetch('/api/diskinfo')
+        .then(async (response) => {
+            this.setState({ disks: await response.json() })
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+    }
+
+    componentDidMount() {
+        this.fetchDiskInfo()
+        this.updateInterval = setInterval(() => {
+            this.fetchDiskInfo()
+        }, 30000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.updateInterval)
+    }
+
+    render() {
+        return html`
+            <div class="pure-u-1">
+                <p class="section-title">disk-info</p>
+                <div class="pure-grid">
+                    ${this.state.disks.map((disk, idx) => {
+                        return html`
+                            <div class="pure-u-1-4">
+                                <div class="disk-name-text">${disk.name}</div>
+                                <div class="disk-usage-bar">
+                                    <div class="disk-usage-bar-inner" style="width: ${(disk.used_space/disk.total_space).toFixed(2)*100}%;"></div>
+                                    <span class="disk-usage-text">${this.formatDiskSpace(disk.used_space)} / ${this.formatDiskSpace(disk.total_space)}</span>
+                                </div>
+                            </div>
+                        `
+                    })}
+                </div>
+            </div>
+        `
+    }
+}
+
+
 class App extends Component {
     render() {
         return html`
         <div class="pure-g">
             <${SystemInfo} />
+            <${DiskInfo} />
             <${CPUBars} />
             <${ProcessesList} />
         </div>
