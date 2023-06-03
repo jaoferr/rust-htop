@@ -10,6 +10,7 @@ body {
     color: #fff1d0;
     padding-left: 1em;
     font-size: 2em;
+    margin-bottom: 0;
 }
 
 .section-title {
@@ -18,6 +19,7 @@ body {
     padding-left: 1em;
     font-size: 1.5em;
     font-weight: bold;
+    margin-top: 0;
 }
 
 .cpu-usage-bar {
@@ -67,4 +69,8 @@ body {
     background-color: black;
     margin: 5px;
     border: 1px white solid;
+}
+
+.system-info-text {
+    background-color: #fff1d0;
 }

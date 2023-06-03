@@ -2,6 +2,7 @@ pub mod utils;
 mod asset_handler;
 mod processes;
 mod cpu_usage;
+mod system_info;
 
 use std::{sync::{Arc, Mutex}};
 use axum::{
@@ -34,6 +35,7 @@ async fn main() {
         .route("/", get(root_get))
         .route("/api/cpu", get(cpu_usage::get_cpus_usage))
         .route("/api/processes", get(processes::get_processes_list))
+        .route("/api/sysinfo", get(system_info::get_sys_info))
         .route("/ws/cpu", get(cpu_usage::get_realtime_cpus_usage))
         .route("/vendor/:type/:module/*path", get(asset_handler::get_npm_asset))
         .route("/asset/*path", get(asset_handler::get_asset))

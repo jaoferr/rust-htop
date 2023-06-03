@@ -35,14 +35,16 @@ class CPUBars extends Component {
         return html`
             <div class="pure-u-1">
                 <p class="section-title">cpu-usage</p>
-                ${this.state.cpus.map((cpu, idx) => {
-                    return html`
-                        <div class="cpu-usage-bar pure-u-1-4">
-                            <div class="cpu-usage-bar-inner" style="width: ${cpu}%;"></div>
-                            <span class="cpu-usage-text">CPU ${idx}: ${cpu.toFixed(2)}%</span>
-                        </div>
-                    `
-                })}
+                <div class="pure-grid">
+                    ${this.state.cpus.map((cpu, idx) => {
+                        return html`
+                            <div class="cpu-usage-bar pure-u-1-4">
+                                <div class="cpu-usage-bar-inner" style="width: ${cpu}%;"></div>
+                                <span class="cpu-usage-text">CPU ${idx}: ${cpu.toFixed(2)}%</span>
+                            </div>
+                        `
+                    })}
+                </div>
             </div>
         `
     }
@@ -113,10 +115,61 @@ class ProcessesList extends Component {
     }
 }
 
+class SystemInfo extends Component {
+    state = { systemInfo: {} }
+
+    formatUptime = (uptime) => {
+        let date = new Date(uptime * 1000)
+        let hours = date.getHours()
+        let minutes = date.getMinutes()
+        let seconds = date.getSeconds()
+        return `${(hours<10) ? '0' + hours : hours}:${(minutes<10) ? '0' + minutes : minutes}:${(seconds<10) ? '0' + seconds : seconds}`
+    }
+
+    componentDidMount() {
+        this.updateInterval = setInterval(() => {
+            fetch('/api/sysinfo')
+            .then(async (response) => {
+                // console.log(await response.json())
+                this.setState({ systemInfo: await response.json() })
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        }, 1000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.updateInterval)
+    }
+
+    render() {
+        return html`
+            <div class="pure-u-1">
+                <div class="pure-grid">
+                    <div class="pure-u-1-4 system-info-text">
+                        <b>System:</b> ${this.state.systemInfo.os_name}
+                    </div>
+                    <div class="pure-u-1-4 system-info-text">
+                        <b>Total memory:</b> ${this.state.systemInfo.total_memory} MB
+                    </div>
+                    <div class="pure-u-1-4 system-info-text">
+                        <b>Available memory:</b> ${this.state.systemInfo.available_memory} MB
+                    </div>
+                    <div class="pure-u-1-4 system-info-text">
+                        <b>Uptime:</b> ${this.formatUptime(this.state.systemInfo.uptime)}
+                    </div>
+                </div>
+            </div>
+        `
+    }
+}
+
 class App extends Component {
     render() {
         return html`
         <div class="pure-g">
+            <${SystemInfo} />
             <${CPUBars} />
             <${ProcessesList} />
         </div>
