@@ -70,6 +70,13 @@ class ProcessesList extends Component {
         })
     }
 
+    truncateText = (text, maxLength = 30) => {
+        if (text.length > maxLength) {
+            return text.substring(0, maxLength) + '...'
+        }
+        return text
+    }
+
     componentDidMount() {
         this.fetchProcessList()
         this.updateInterval = setInterval(() => {
@@ -94,9 +101,11 @@ class ProcessesList extends Component {
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>PID</th>
-                            <th>Name</th>
-                            <th>Memory usage (kB)</th>
+                            <th>pid</th>
+                            <th>name</th>
+                            <th>cpu-usage</th>
+                            <th>memory-usage (kB)</th>
+                            <th>cmd</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -106,7 +115,9 @@ class ProcessesList extends Component {
                                     <td>${idx}</td>
                                     <td>${process.pid}</td>
                                     <td>${process.process_name}</td>
+                                    <td>${process.cpu_usage.toFixed(2)}</td>
                                     <td>${process.memory_usage}</td>
+                                    <td>${this.truncateText(process.command)}</td>
                                 </tr>
                             `
                         })}
@@ -138,7 +149,7 @@ class SystemInfo extends Component {
             .catch((error) => {
                 console.log(error)
             })
-        }, 1000)
+        }, 3000)
     }
 
     componentWillUnmount() {
