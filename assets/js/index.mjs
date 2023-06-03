@@ -38,9 +38,11 @@ class CPUBars extends Component {
                 <div class="pure-grid">
                     ${this.state.cpus.map((cpu, idx) => {
                         return html`
-                            <div class="cpu-usage-bar pure-u-1-4">
-                                <div class="cpu-usage-bar-inner" style="width: ${cpu}%;"></div>
-                                <span class="cpu-usage-text">CPU ${idx}: ${cpu.toFixed(2)}%</span>
+                            <div class="pure-u-1-4">
+                                <div class="cpu-usage-bar">
+                                    <div class="cpu-usage-bar-inner" style="width: ${cpu}%;"></div>
+                                    <span class="cpu-usage-text">CPU ${idx}: ${cpu.toFixed(2)}%</span>
+                                </div>
                             </div>
                         `
                     })}
@@ -147,17 +149,25 @@ class SystemInfo extends Component {
         return html`
             <div class="pure-u-1">
                 <div class="pure-grid">
-                    <div class="pure-u-1-4 system-info-text">
-                        <b>System:</b> ${this.state.systemInfo.os_name}
+                    <div class="pure-u-1-4">
+                        <div class="system-info-text">
+                            <b>System:</b> ${this.state.systemInfo.os_name}
+                        </div>
                     </div>
-                    <div class="pure-u-1-4 system-info-text">
-                        <b>Total memory:</b> ${this.state.systemInfo.total_memory} MB
+                    <div class="pure-u-1-4">
+                        <div class="system-info-text">
+                            <b>Total memory:</b> ${this.state.systemInfo.total_memory} MB
+                        </div>
                     </div>
-                    <div class="pure-u-1-4 system-info-text">
-                        <b>Available memory:</b> ${this.state.systemInfo.available_memory} MB
+                    <div class="pure-u-1-4">
+                        <div class="system-info-text">
+                            <b>Available memory:</b> ${this.state.systemInfo.available_memory} MB
+                        </div>
                     </div>
-                    <div class="pure-u-1-4 system-info-text">
-                        <b>Uptime:</b> ${this.formatUptime(this.state.systemInfo.uptime)}
+                    <div class="pure-u-1-4">
+                        <div class="system-info-text">
+                            <b>Uptime:</b> ${this.formatUptime(this.state.systemInfo.uptime)}
+                        </div>
                     </div>
                 </div>
             </div>

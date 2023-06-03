@@ -10,6 +10,7 @@ body {
     color: #fff1d0;
     padding-left: 1em;
     font-size: 2em;
+    margin-top: 0;
     margin-bottom: 0;
 }
 
@@ -20,6 +21,7 @@ body {
     font-size: 1.5em;
     font-weight: bold;
     margin-top: 0;
+    margin-bottom: 0;
 }
 
 .cpu-usage-bar {
@@ -73,4 +75,6 @@ body {
 
 .system-info-text {
     background-color: #fff1d0;
+    padding: 5px;
+    border-right: #402e2a solid;
 }
