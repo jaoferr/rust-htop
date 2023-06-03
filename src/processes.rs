@@ -13,7 +13,8 @@ use super::utils::empty_string_as_none;
 #[derive(Serialize)]
 struct ProcessJSON {
     pid: String,
-    process_name: String
+    process_name: String,
+    memory_usage: u64
 }
 
 #[derive(Deserialize)]
@@ -34,7 +35,8 @@ pub async fn get_processes_list(State(system_state): State<AppState>, query: Que
         .map(|p|
             ProcessJSON {
                 pid: p.0.to_string(),
-                process_name: p.1.name().to_string()
+                process_name: p.1.name().to_string(),
+                memory_usage: sys.process(p.0.to_owned()).unwrap().memory() / 1000
             }
         ).collect();
 

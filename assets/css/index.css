@@ -55,3 +55,16 @@ body {
 .process-table tbody>tr {
     background-color: #fff1d0;
 }
+
+.input-process-limit {
+    display: inline;
+    padding: 1em;
+}
+
+.input-process-limit input {
+    text-align: center;
+    color: white;
+    background-color: black;
+    margin: 5px;
+    border: 1px white solid;
+}

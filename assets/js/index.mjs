@@ -20,7 +20,7 @@ class CPUBars extends Component {
                 connect()
             }, 1000)
         }
-        
+
         this.cpuWS.onerror = function(err) {
             console.error('Socket encountered error: ', err.message, 'Closing socket')
             this.cpuWS.close()
@@ -30,9 +30,9 @@ class CPUBars extends Component {
     componentWillUnmount() {
         this.cpuWS.close()
     }
-    
+
     render() {
-        return html`    
+        return html`
             <div class="pure-u-1">
                 <p class="section-title">cpu-usage</p>
                 ${this.state.cpus.map((cpu, idx) => {
@@ -50,18 +50,27 @@ class CPUBars extends Component {
 
 class ProcessesList extends Component {
     state = { processes: [] }
+    queryLimit = 20
+
+    updateQueryLimit = e => {
+        this.queryLimit = e.target.value
+    }
+
+    fetchProcessList = () => {
+        fetch(`/api/processes?limit=${this.queryLimit}`)
+        .then(async (response) => {
+            this.setState({ processes: await response.json() })
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+    }
 
     componentDidMount() {
+        this.fetchProcessList()
         this.updateInterval = setInterval(() => {
-            fetch('/api/processes')
-                .then(async (response) => {
-                    this.setState({ processes: await response.json() })
-                    console.log('updated process list')
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
-        }, 1000)
+            this.fetchProcessList()
+        }, 10000)
     }
 
     componentWillUnmount() {
@@ -71,13 +80,19 @@ class ProcessesList extends Component {
     render() {
         return html`
             <div class="pure-u-1">
-                <p class="section-title">processes</p>
+                <p class="section-title">
+                    processes
+                    <div class="input-process-limit">
+                        <input type="text" name="processLimit" id="processLimit" value="${this.queryLimit}" maxlength="3" size="3" onChange="${this.updateQueryLimit}"/>
+                    </div>
+                </p>
                 <table class="pure-table pure-table-horizontal process-table">
                     <thead>
                         <tr>
                             <th>#</th>
                             <th>PID</th>
                             <th>Name</th>
+                            <th>Memory usage (kB)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -87,6 +102,7 @@ class ProcessesList extends Component {
                                     <td>${idx}</td>
                                     <td>${process.pid}</td>
                                     <td>${process.process_name}</td>
+                                    <td>${process.memory_usage}</td>
                                 </tr>
                             `
                         })}
