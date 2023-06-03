@@ -48,9 +48,10 @@ body {
 }
 
 .process-table thead {
-    background-color: #fff1d0;
+    color: #fff1d0;
+    background-color: black;
 }
 
 .process-table tbody>tr {
-    background-color: rgba(255, 241, 208, 0.7);
+    background-color: #fff1d0;
 }
