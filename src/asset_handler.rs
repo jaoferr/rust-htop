@@ -4,8 +4,9 @@ use axum::{
     extract::{Path},
     response::IntoResponse,
     http::Response,
-    body::Body
+    body::{Body, StreamBody}
 };
+use tokio_util::io::ReaderStream;
 
 
 pub async fn get_asset(Path(path): Path<String>) -> impl IntoResponse {
@@ -42,18 +43,34 @@ pub async fn get_npm_asset(
             asset_path = format!("node_modules/{}/build/{}", module, path);
             content_type = mime::TEXT_CSS_UTF_8.to_string();
         },
+        "font" => {
+            asset_path = format!("node_modules/@fontsource/{}/{}", module, path);
+
+            if path.ends_with("woff2") {
+                content_type = mime::FONT_WOFF2.to_string();
+            } else if path.ends_with("woff") {
+                content_type = mime::FONT_WOFF.to_string();
+            } else {
+                content_type = mime::TEXT_CSS_UTF_8.to_string();
+            }
+        }
         _ => {
             asset_path = format!("node_modules/{}/dist/{}", module, path);
             content_type = mime::APPLICATION_JAVASCRIPT_UTF_8.to_string();
         }
     }
 
-    let asset = tokio::fs::read_to_string(&asset_path).await;
+    println!("content-type: {} | file_path: {}", content_type, asset_path);
 
-    if asset.is_ok() {
+    let file = tokio::fs::File::open(asset_path).await;
+
+    if file.is_ok() {
+        let stream = ReaderStream::new(file.unwrap());
+        let body = StreamBody::new(stream);
+
         Response::builder()
             .header("content-type", content_type)
-            .body(asset.unwrap())
+            .body(body)
             .unwrap().into_response()
     } else {
         Response::builder()
