@@ -13,3 +13,4 @@ serde = { version = "1.0.163", features = ["derive"]}
 serde_json = "1.0.96"
 sysinfo = "0.28.4"
 tokio = { version = "1.27.0", features = ["full"] }
+tokio-util = { version = "0.7.8", features = ["io"] }
