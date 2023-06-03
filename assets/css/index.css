@@ -60,7 +60,7 @@ body {
 
 .input-process-limit {
     display: inline;
-    padding: 1em;
+    font-size: 0.75em;
 }
 
 .input-process-limit input {
