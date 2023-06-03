@@ -12,7 +12,8 @@ use serde::{Serialize};
 struct DiskInfoJSON {
     name: String,
     available_space: u64,
-    total_space: u64
+    total_space: u64,
+    used_space: u64
 }
 
 #[axum::debug_handler]
@@ -25,7 +26,8 @@ pub async fn get_disk_info(State(system_state): State<AppState>) -> impl IntoRes
             return DiskInfoJSON {
                 name: disk.name().to_os_string().into_string().unwrap(),
                 available_space: disk.available_space() / 1000000,
-                total_space: disk.total_space() / 1000000
+                total_space: disk.total_space() / 1000000,
+                used_space: (disk.total_space() - disk.available_space()) / 1000000
             }
         }
         ).collect();
