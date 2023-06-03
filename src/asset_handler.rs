@@ -60,8 +60,6 @@ pub async fn get_npm_asset(
         }
     }
 
-    println!("content-type: {} | file_path: {}", content_type, asset_path);
-
     let file = tokio::fs::File::open(asset_path).await;
 
     if file.is_ok() {
