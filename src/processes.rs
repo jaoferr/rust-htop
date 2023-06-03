@@ -29,7 +29,6 @@ pub struct QueryLimit {
 pub async fn get_processes_list(State(system_state): State<AppState>, query: Query<QueryLimit>) -> impl IntoResponse {
     let mut sys = system_state.sys.lock().unwrap();
     sys.refresh_processes();
-    let _processes = sys.processes();
 
     let limit = query.limit.unwrap_or(20);
 
