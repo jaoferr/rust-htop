@@ -77,6 +77,25 @@ class ProcessesList extends Component {
         return text
     }
 
+    /**
+     *
+     * @param {number} memUsage
+     * @returns {string}
+     */
+    formatMemoryUsage = (memUsage) => {
+        let stringMemUsage
+
+        if (memUsage > 1e6) {
+            stringMemUsage = (memUsage / 1e6).toFixed(2) + " GB"
+        } else if (memUsage > 1e3) {
+            stringMemUsage = (memUsage / 1e3).toFixed(2) + " MB"
+        } else {
+            stringMemUsage = memUsage + " KB"
+        }
+
+        return stringMemUsage
+    }
+
     componentDidMount() {
         this.fetchProcessList()
         this.updateInterval = setInterval(() => {
@@ -104,7 +123,7 @@ class ProcessesList extends Component {
                             <th>pid</th>
                             <th>name</th>
                             <th>cpu-usage</th>
-                            <th>memory-usage (kB)</th>
+                            <th>memory-usage</th>
                             <th>cmd</th>
                         </tr>
                     </thead>
@@ -116,7 +135,7 @@ class ProcessesList extends Component {
                                     <td>${process.pid}</td>
                                     <td>${process.process_name}</td>
                                     <td>${process.cpu_usage.toFixed(2)}</td>
-                                    <td>${process.memory_usage}</td>
+                                    <td>${this.formatMemoryUsage(process.memory_usage)}</td>
                                     <td>${this.truncateText(process.command)}</td>
                                 </tr>
                             `
