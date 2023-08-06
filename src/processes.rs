@@ -32,7 +32,15 @@ pub async fn get_processes_list(State(system_state): State<AppState>, query: Que
 
     let limit = query.limit.unwrap_or(20);
 
-    let v: Vec<_> = sys.processes().iter().take(limit)
+    let mut process_list: Vec<_> = sys.processes().iter().collect();
+    process_list.sort_by(|c, n| {
+        let current_process = sys.process(c.0.to_owned()).unwrap();
+        let next_process = sys.process(n.0.to_owned()).unwrap();
+        current_process.memory().cmp(&next_process.memory())
+    });
+    process_list.reverse();
+
+    let v: Vec<_> = process_list.iter().take(limit)
         .map(|p| {
             let this_process = sys.process(p.0.to_owned()).unwrap();
             return ProcessJSON {
@@ -43,7 +51,7 @@ pub async fn get_processes_list(State(system_state): State<AppState>, query: Que
                 cpu_usage: this_process.cpu_usage()
             }
         }
-        ).collect();
+    ).collect();   
 
     Json(v)
 }
