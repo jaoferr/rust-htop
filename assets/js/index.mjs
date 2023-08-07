@@ -55,13 +55,18 @@ class CPUBars extends Component {
 class ProcessesList extends Component {
     state = { processes: [] }
     queryLimit = 20
+    queryOrderDescending = true
 
     updateQueryLimit = e => {
         this.queryLimit = e.target.value
     }
 
+    updateQueryOrder = e => {
+        this.queryOrderDescending = e.target.checked
+    }
+
     fetchProcessList = () => {
-        fetch(`/api/processes?limit=${this.queryLimit}`)
+        fetch(`/api/processes?limit=${this.queryLimit}&order=${this.queryOrderDescending ? 'desc' : 'asc'}`)
         .then(async (response) => {
             this.setState({ processes: await response.json() })
         })
@@ -114,6 +119,8 @@ class ProcessesList extends Component {
                     processes
                     <div class="input-process-limit">
                         <input type="text" name="processLimit" id="processLimit" value="${this.queryLimit}" maxlength="3" size="3" onChange="${this.updateQueryLimit}"/>
+                        <input type="checkbox" name="processOrder" id="processOrder" onChange="${this.updateQueryOrder}" checked=${this.queryOrderDescending}/>
+                        <label for="processOrder">descending</label>
                     </div>
                 </p>
                 <table class="pure-table pure-table-horizontal process-table">

@@ -20,13 +20,14 @@ struct ProcessJSON {
 }
 
 #[derive(Deserialize)]
-pub struct QueryLimit {
+pub struct QueryArgs {
     #[serde(default, deserialize_with = "empty_string_as_none")]
-    limit: Option<usize>
+    limit: Option<usize>,
+    order: Option<String>
 }
 
 #[axum::debug_handler]
-pub async fn get_processes_list(State(system_state): State<AppState>, query: Query<QueryLimit>) -> impl IntoResponse {
+pub async fn get_processes_list(State(system_state): State<AppState>, query: Query<QueryArgs>) -> impl IntoResponse {
     let mut sys = system_state.sys.lock().unwrap();
     sys.refresh_processes();
 
@@ -38,7 +39,12 @@ pub async fn get_processes_list(State(system_state): State<AppState>, query: Que
         let next_process = sys.process(n.0.to_owned()).unwrap();
         current_process.memory().cmp(&next_process.memory())
     });
-    process_list.reverse();
+
+    match query.order.as_deref() {
+        Some("asc") => (),
+        Some("desc") => process_list.reverse(),
+        _ => process_list.reverse()
+    }
 
     let v: Vec<_> = process_list.iter().take(limit)
         .map(|p| {
