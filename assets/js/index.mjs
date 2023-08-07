@@ -138,7 +138,7 @@ class ProcessesList extends Component {
                         ${this.state.processes.map((process, idx) => {
                             return html`
                                 <tr>
-                                    <td>${idx}</td>
+                                    <td>${idx + 1}</td>
                                     <td>${process.pid}</td>
                                     <td>${process.process_name}</td>
                                     <td>${process.cpu_usage.toFixed(2)}</td>
