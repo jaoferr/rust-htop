@@ -105,7 +105,7 @@ class ProcessesList extends Component {
         this.fetchProcessList()
         this.updateInterval = setInterval(() => {
             this.fetchProcessList()
-        }, 10000)
+        }, 10000)  // make this an option
     }
 
     componentWillUnmount() {
@@ -180,7 +180,7 @@ class SystemInfo extends Component {
         this.fetchSystemInfo()
         this.updateInterval = setInterval(() => {
             this.fetchSystemInfo()
-        }, 10000)
+        }, 10000)  // make this an option
     }
 
     componentWillUnmount() {
@@ -241,7 +241,7 @@ class DiskInfo extends Component {
         this.fetchDiskInfo()
         this.updateInterval = setInterval(() => {
             this.fetchDiskInfo()
-        }, 30000)
+        }, 60000)
     }
 
     componentWillUnmount() {
